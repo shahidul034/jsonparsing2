@@ -5,13 +5,11 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,42 +36,47 @@ public class MainActivity extends AppCompatActivity {
 
         String myURL = "http://mrubel.com/tuntuninews/api/gettingnews.php";
 
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, myURL, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray jsarr=response.getJSONArray("contacts");
-                            JSONObject jsobj=jsarr.getJSONObject(0);
-                            t1=t1+jsobj.getString("name");
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(myURL, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
 
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        tv.setText(t1);
+
+                for (int i =0; i < response.length(); i++){
+
+                    try {
+
+                        JSONObject jsonObject = (JSONObject) response.get(i);
+                       t1 =t1+ jsonObject.getString("title")+"\n\n";
+                     t2 = t2+ jsonObject.getString("news")+"\n\n";
+                       // news_time[i] = jsonObject.getString("time");
 
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
+                    tv.setText(t1+t2);
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
 
-                    }
-                });
+                }
 
 
 
 
 
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d("Volley Log", error);
+            }
+        });
 
 
-
-
-
-
+        com.shakibcsekuet.jsonparsing.AppController.getInstance().addToRequestQueue(jsonArrayRequest);
+        Toast.makeText(getApplicationContext(), "Data Loaded Successfully!", Toast.LENGTH_SHORT).show();
 
     }
+
+
+}
