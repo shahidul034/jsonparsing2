@@ -2,6 +2,8 @@ package com.shakibcsekuet.jsonparsing;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,15 +19,15 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     TextView tv;
-    String t1 = "";
-    String t2 = "";
 
+    ListView lv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tv = (TextView) findViewById(R.id.showdata);
+        lv = (ListView) findViewById(R.id.listview);
+
         fetchingData();
 
 
@@ -40,25 +42,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONArray response) {
 
-
+                final String[] news_title = new String[response.length()];
+                final String[] news_detail = new String[response.length()];
+                final String[] news_time = new String[response.length()];
 
                 for (int i =0; i < response.length(); i++){
 
                     try {
 
                         JSONObject jsonObject = (JSONObject) response.get(i);
-                       t1 =t1+ jsonObject.getString("title")+"\n\n";
-                     t2 = t2+ jsonObject.getString("news")+"\n\n";
-                       // news_time[i] = jsonObject.getString("time");
+                        news_title[i] = jsonObject.getString("title");
+                        news_detail[i] = jsonObject.getString("news");
+                        news_time[i] = jsonObject.getString("time");
 
 
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    tv.setText(t1+t2);
+
 
 
                 }
+                lv.setAdapter(new ArrayAdapter(getApplicationContext(), R.layout.textview, R.id.text, news_title));
 
 
 
