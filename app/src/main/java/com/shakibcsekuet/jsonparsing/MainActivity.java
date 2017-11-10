@@ -1,7 +1,11 @@
 package com.shakibcsekuet.jsonparsing;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telecom.Call;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,9 +23,7 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     TextView tv;
-
     ListView lv;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,13 +31,9 @@ public class MainActivity extends AppCompatActivity {
         lv = (ListView) findViewById(R.id.listview);
 
         fetchingData();
-
-
     }
 
     void fetchingData(){
-
-
         String myURL = "http://mrubel.com/tuntuninews/api/gettingnews.php";
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(myURL, new Response.Listener<JSONArray>() {
@@ -55,20 +53,22 @@ public class MainActivity extends AppCompatActivity {
                         news_detail[i] = jsonObject.getString("news");
                         news_time[i] = jsonObject.getString("time");
 
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
-
-
                 }
                 lv.setAdapter(new ArrayAdapter(getApplicationContext(), R.layout.textview, R.id.text, news_title));
-
-
-
-
-
+               lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                   @Override
+                   public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                       Intent intent = new Intent(MainActivity.this, details.class);
+                       intent.putExtra("MyTITLE", news_title[position]);
+                       intent.putExtra("MyNEWS", news_detail[position]);
+                       intent.putExtra("MyTime", news_time[position]);
+                       startActivity(intent);
+                   }
+               });
             }
         }, new Response.ErrorListener() {
             @Override
@@ -76,12 +76,8 @@ public class MainActivity extends AppCompatActivity {
                 VolleyLog.d("Volley Log", error);
             }
         });
-
-
         com.shakibcsekuet.jsonparsing.AppController.getInstance().addToRequestQueue(jsonArrayRequest);
         Toast.makeText(getApplicationContext(), "Data Loaded Successfully!", Toast.LENGTH_SHORT).show();
 
     }
-
-
 }
